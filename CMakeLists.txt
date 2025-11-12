@@ -1,19 +1,34 @@
 cmake_minimum_required(VERSION 3.18)
-project(CUDA LANGUAGES CXX CUDA)
 
+set(PROJECT_NAME cuda_programming)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CUDA_STANDARD 17)
-
-# RTX 4070 ti super -> (Ada Lovelace)
 set(CMAKE_CUDA_ARCHITECTURES 89)
 
-add_executable(main ch_2/main.cu)
+project(${PROJECT_NAME} LANGUAGES CXX CUDA)
 
 set(CMAKE_CUDA_FLAGS_DEBUG "-g -G")
 
-target_compile_options(main PRIVATE
-    $<$<COMPILE_LANGUAGE:CUDA>:
-        -g
-        --expt-relaxed-constexpr
-    >
-)
+file(GLOB CH2_FILES "ch_2/*.cu")
+foreach(file ${CH2_FILES})
+    get_filename_component(filename ${file} NAME_WE)
+    add_executable(ch2_${filename} ${file})
+    target_compile_options(ch2_${filename} PRIVATE
+        $<$<COMPILE_LANGUAGE:CUDA>:
+            -g
+            --expt-relaxed-constexpr
+        >
+    )
+endforeach()
+
+file(GLOB CH3_FILES "ch_3/*.cu")
+foreach(file ${CH3_FILES})
+    get_filename_component(filename ${file} NAME_WE)
+    add_executable(ch3_${filename} ${file})
+    target_compile_options(ch3_${filename} PRIVATE
+        $<$<COMPILE_LANGUAGE:CUDA>:
+            -g
+            --expt-relaxed-constexpr
+        >
+    )
+endforeach()
