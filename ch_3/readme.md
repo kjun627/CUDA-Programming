@@ -42,3 +42,18 @@ CUDA API의 return 값이 대부분 enum 임.(에러 코드 수 많음) cudaSucc
 __host__ __device__ const char* cudaGetErrorName (cudaError_t error)
 ```
 **호스트 디바이스 코드에서 모두 사용 가능**
+
+### 호스트 - 디바이스 메모리 데이터 복사 - cudaMemcpy()
+
+```c
+cudaError_t cudaMemcpy (void* dst, const void* src, size_t size, enum cudaMemcpykind kind)
+```
+dst 로 src의 데이터를 복사함. 
+```c
+cudaMemcpykind 종류
+cudaMemcpyHostToHost // 호스트 메모리 -> 호스트 메모리
+cudaMemcpyHostToDevice // 호스트 메모리 -> 디바이스 메모리
+cudaMemcpyDeviceToHost // 디바이스 메모리 -> 호스트 메모리
+cudaMemcpyDeviceToDevice // 디마시으 메모리 -> 디바이스 메모리
+cudaMemcpyDefuault // dst, src로 결정 됨. (unified virtual addressing 지원 시스템에서만 사용 가능)
+```
