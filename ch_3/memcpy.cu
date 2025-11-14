@@ -22,8 +22,20 @@ int main(){
     printData<<<1,10>>>(dDataPtr);
 
     cudaMemcpy(dDataPtr, data, sizeof(int)*10 , cudaMemcpyHostToDevice);
-    printf("\nDevice -> Host: ");
+    printf("\nHost -> Device: ");
     for (int i = 0; i < 10; i++) printf("%d", data[i]);
 
+    printf("\nreceive Data from Host: ");
+    printData<<<1,10>>>(dDataPtr);
+    cudaDeviceSynchronize(); // 이거 없이 실행하면 cuda 커널 실행하고 결과를 기다리지 않고 바로 다음 cmd 실행함.
+    // 동기화 해줘야한다. -> 근데 이게 맞나..?
+    
+    printf("\nChange Device Data: ");
+    setdata<<<1,10>>>(dDataPtr);
+    printData<<<1,10>>>(dDataPtr);
+
+    cudaMemcpy(data,dDataPtr, sizeof(int)*10, cudaMemcpyDeviceToHost);
+    printf("\nDevice -> Host: ");
+    for (int i = 0; i < 10; i++) printf("%d", data[i]);
     cudaFree(dDataPtr);
 }
