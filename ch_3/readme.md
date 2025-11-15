@@ -57,3 +57,19 @@ cudaMemcpyDeviceToHost // 디바이스 메모리 -> 호스트 메모리
 cudaMemcpyDeviceToDevice // 디마시으 메모리 -> 디바이스 메모리
 cudaMemcpyDefuault // dst, src로 결정 됨. (unified virtual addressing 지원 시스템에서만 사용 가능)
 ```
+
+## 3.4 CUDA 알고리즘 성능 측정
+### Kernel 수행 시간
+
+GPU 연산은 커널 호출로 진행. <- CUDA 알고리즘의 성능 측정 주요 지점.
+커널 호출 전, 커널 실행이 종류된 후 시간을 측정
+
+**커널 호출 시 디바이스에게 명령어 전달한 후 프로그램의 flow control을 바로 호스트에게 반환 ( 다음 라인이 바로 실행된다는 거임 - asynchronous 특성)**
+
+### 데이터 전송 시간
+CUDA Program의 큰 흐름 
+1. 호스트 -> 디바이스 데이터 복사. (host program 에는 없는 부분)
+2. GPU 연산
+3. 3 디바이스 -> 호스트 데이터 복사. (host program 에는 없는 부분)
+
+데이터를 복사하는 부분도 GPU 사용을 위해서 추가적으로 작업하는 것임. **데이터 전송시간도 고려해야함.**

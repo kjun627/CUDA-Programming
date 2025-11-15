@@ -1,10 +1,13 @@
 #include "cuda_runtime.h"
 #include "device_launch_parameters.h"
+#include "DS_timer.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-#define NUM_DATA 1024
+
+
+#define NUM_DATA 1024 * 1024
 
 __global__ void sumVector(int* _dDataPtr1, int* _dDataPtr2){
     _dDataPtr1[threadIdx.x] += _dDataPtr2[threadIdx.x];
@@ -18,6 +21,14 @@ int main(void){
     int* a, * b, * c;
     int* dDataPtr1, * dDataPtr2; 
     int memSize = sizeof(int)* NUM_DATA;
+    DS_timer timer(5);
+    timer.setTimerName(0, (char*) "CUDA Time");
+    timer.setTimerName(1, (char*) "Computation (Kernel)");
+    timer.setTimerName(2, (char*) "Data transport : Host -> Device");
+    timer.setTimerName(3, (char*) "Data transport : Device -> Host");
+    timer.setTimerName(4, (char*) "vector add cal on host");
+    timer.initTimers();
+
     cudaError_t errorCode;
     
     a = new int[NUM_DATA]; memset(a, 0, memSize);
@@ -29,10 +40,12 @@ int main(void){
         b[i] = rand() % 10;
     }
 
+    timer.onTimer(4);
     for (int i = 0; i < NUM_DATA; i++){
         c[i] = a[i] + b[i];
     }
-    
+    timer.offTimer(4);
+
     errorCode = cudaMalloc(&dDataPtr1, memSize);
     printf("cudaMalloc1 - %s\n", cudaGetErrorName(errorCode));
     errorCode = cudaMalloc(&dDataPtr2, memSize);
@@ -43,20 +56,26 @@ int main(void){
     errorCode = cudaMemset(dDataPtr2,0, memSize);
     printf("cudaMemset2 - %s\n", cudaGetErrorName(errorCode));
     
+    timer.onTimer(0);
+
+    timer.onTimer(2);
     errorCode = cudaMemcpy(dDataPtr1, a, memSize, cudaMemcpyHostToDevice);
     printf("cudaMemcpy1 - %s\n", cudaGetErrorName(errorCode));
     errorCode = cudaMemcpy(dDataPtr2, b, memSize, cudaMemcpyHostToDevice);
     printf("cudaMemcpy2 - %s\n", cudaGetErrorName(errorCode));
+    timer.offTimer(2);
     
-    delete[] b;
-
+    timer.onTimer(1);
     sumVector<<<1,NUM_DATA>>>(dDataPtr1, dDataPtr2);
-    errorCode = cudaGetLastError();
-    printf("kernel launch - %s", cudaGetErrorName(errorCode));
+    cudaDeviceSynchronize();
+    timer.offTimer(1);
 
+    timer.onTimer(3);
     //cuda memcpy는 호스트 함수임!!
     errorCode = cudaMemcpy(a, dDataPtr1, memSize, cudaMemcpyDeviceToHost);
     printf("cudaMemcpy3 - %s\n", cudaGetErrorName(errorCode));
+    timer.offTimer(3);
+    timer.offTimer(0);
 
     cudaFree(dDataPtr1); cudaFree(dDataPtr2);
 
@@ -72,5 +91,8 @@ int main(void){
     if(results){
         printf("Work done");
     }
-    delete[] a,delete[] c;
+
+    timer.printTimer(); 
+
+    delete[] a; delete[] b; delete[] c;
 }
