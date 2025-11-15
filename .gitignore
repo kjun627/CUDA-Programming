@@ -1,3 +1,6 @@
 build/
 .vscode/
 desktop.ini
+ch_3/DS_definitions.h
+ch_3/DS_timer.cpp
+DS_timer.h
