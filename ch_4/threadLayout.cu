@@ -1,13 +1,13 @@
-#inlcude "cuda_runtime.h"
-#inlcude "device_launch_parameters.h"
+#include "cuda_runtime.h"
+#include "device_launch_parameters.h"
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
 __global__ void checkIndex(){
-    printf("treadIdx: (%d, %d, %d) blockIdx: (%d, %d, %d)
-    blockDim: (%d, %d, %d) gridDim: (%d, %d, %d,)\n",
+    printf("treadIdx: (%d, %d, %d) blockIdx: (%d, %d, %d) \
+    blockDim: (%d, %d, %d) gridDim: (%d, %d, %d)\n",
     threadIdx.x, threadIdx.y, threadIdx.z,
     blockIdx.x, blockIdx.y, blockIdx.z,
     blockDim.x, blockDim.y, blockDim.z,
