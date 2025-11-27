@@ -50,12 +50,12 @@ __global__ void vecAdd(int* _dDataPtr1, int* _dDataPtr2, int _size){
 ### 블록 내에서의 스레드 global Index  
 
 하나의 블록안에서의 global index  
-1D 일 때 = threadIdx.x 
-2D 일 때 = blockDim.x * threadIdx.y + threadIdx.x
+1D 일 때 = threadIdx.x  
+2D 일 때 = blockDim.x * threadIdx.y + threadIdx.x  
 3D 일 때 = blockDim.x * blockDim.y * threadIdx.z + (2차원 블록 안에서의 tid)
 
-### 그리드 내 스레드 global Index
-NUM_THREAD_IN_BLOCK = blockDim.x * blockDim.y * blockDim.z (블록 내 스레드 총 개수)  
+### global thread Index in Grid
+NUM_THREAD_IN_BLOCK = blockDim.x * blockDim.y * blockDim.z (블록 내 스레드 총 개수)   
 1D Grid = blockIdx.x * (NUM_THREAD_IN_BLOCK) + TID_IN_BLOCK
 2D Grid = gridDim.x * NUM_THREAD_IN_BLOCK * blockIdx.y + 1D Graid
 3D Grid = blockIdx.x * gridDim.y * gridIm.x * NUM_THREAD_IN_BLOCk + 2D_GRID_TID
@@ -74,3 +74,13 @@ index (row, col) = row * (length(row)) + col
 index (row, col) = row * blockDim.x + col
                  = threadIdx.y * blockDim.x + threadIdx.x
 ```
+
+### Large Scale Matrix calculation
+이전 설명에서는 Thread의 global index를 1D, 2D 에서만 설명헀다. 다만 이전의 설명 방법과 별개로 
+Thread layout,indexing은 데이터, 알고리즘에 따라 설계 방법이 달라질 수 있다.
+
+근데 만약 행렬의 크기가 1024x1024보다 크면 어떻게 해야할까?
+
+(2D Grid, 2D block), (1D Grid, 1D Block), (2D Grid, 1D Block)
+
+이렇게 나누어서 한번 해결해보려한다.
